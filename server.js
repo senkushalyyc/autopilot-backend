@@ -33,6 +33,37 @@ app.post("/tasks/:date", (req, res) => {
   res.json({ status: "ok" });
 });
 
+const MEMORY_FILE = path.join(__dirname, "memory.json");
+
+// Load memory
+function loadMemory() {
+  if (!fs.existsSync(MEMORY_FILE)) return [];
+  return JSON.parse(fs.readFileSync(MEMORY_FILE));
+}
+
+// Save memory
+function saveMemory(data) {
+  fs.writeFileSync(MEMORY_FILE, JSON.stringify(data, null, 2));
+}
+
+// GET all memory
+app.get("/memory", (req, res) => {
+  const memory = loadMemory();
+  res.json(memory);
+});
+
+// POST a new memory entry
+app.post("/memory", (req, res) => {
+  const memory = loadMemory();
+  const newEntry = {
+    date: new Date().toISOString(),
+    ...req.body,
+  };
+  memory.push(newEntry);
+  saveMemory(memory);
+  res.json({ status: "ok", saved: newEntry });
+});
+
 app.listen(PORT, () => {
   console.log(`✅ Backend running on port ${PORT}`);
 });
