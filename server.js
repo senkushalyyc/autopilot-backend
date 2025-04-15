@@ -67,3 +67,15 @@ app.post("/memory", (req, res) => {
 app.listen(PORT, () => {
   console.log(`✅ Backend running on port ${PORT}`);
 });
+
+// DELETE a memory by index
+app.delete("/memory/:index", (req, res) => {
+  const memory = loadMemory();
+  const idx = parseInt(req.params.index);
+  if (isNaN(idx) || idx < 0 || idx >= memory.length) {
+    return res.status(400).json({ error: "Invalid index" });
+  }
+  const deleted = memory.splice(idx, 1);
+  saveMemory(memory);
+  res.json({ status: "deleted", entry: deleted[0] });
+});
